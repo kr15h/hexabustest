@@ -29,27 +29,42 @@ func main() {
 
 	// Enter infinite loop of switching on and off
 	for {
-		// Create write packet to switch on and off
-		var wPack hexabus.WritePacket = hexabus.WritePacket{hexabus.FLAG_NONE,
-			1, hexabus.DTYPE_BOOL, switchState}
+		timeLoopStart := time.Now()
 
-		// Debug
-		var switchStateStr string = "Off"
-		if switchState {
-			switchStateStr = "On"
-		}
-		fmt.Printf("Switching %s\n", switchStateStr)
+		// Launch hexabus switch function as a concurent routine
+		// as it takes more than 3 seconds to exec
+		go Switch(switchState)
+		switchState = !switchState
 
-		// Send packet to switch
-		err = wPack.Send(switchAddress)
+		// Sleep for some time
+		time.Sleep(500 * time.Millisecond)
 
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			switchState = !switchState
-		}
-
-		time.Sleep(2000 * time.Millisecond)
+		// Measure how much time the loop did take
+		timeLoopElapsed := time.Since(timeLoopStart)
+		fmt.Printf("Loop took %f seconds\n", timeLoopElapsed.Seconds())
 	}
 
+}
+
+func Switch(switchState bool) {
+
+	// Create write packet to switch on and off
+	var wPack hexabus.WritePacket = hexabus.WritePacket{hexabus.FLAG_NONE,
+		1, hexabus.DTYPE_BOOL, switchState}
+
+	// Debug
+	var switchStateStr string = "Off"
+	if switchState {
+		switchStateStr = "On"
+	}
+
+	// Send packet to switch
+	timeStart := time.Now()
+	fmt.Printf("Sending packet with state %s", switchStateStr)
+	err := wPack.Send(switchAddress)
+	timeElapsed := time.Since(timeStart)
+	fmt.Printf(" took %f seconds\n", timeElapsed.Seconds())
+	if err != nil {
+		fmt.Println(err)
+	}
 }
