@@ -72,7 +72,7 @@ usb0      Link encap:Ethernet  HWaddr 02:50:c4:04:02:bd
   };
 };
  ```  
- Again - remember to change the fafa with your prefix. Run `sudo radvd` to start the daemon.
+ Again - remember to change the fafa with your prefix. Type `sudo radvd` to start the daemon.
  
  11. Ping your plugs with global addresses:  
  ```
